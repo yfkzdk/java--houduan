@@ -1,0 +1,38 @@
+spring:
+  profiles:
+    active: test
+  autoconfigure:
+    exclude:
+      # 测试环境不连真实 MySQL
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - com.alibaba.druid.spring.boot3.autoconfigure.DruidDataSourceAutoConfigure
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+jwt:
+  secret: test-secret-for-ci-only
+  expiration: 3600
+  token-header: Authorization
+  token-head: "Bearer "
+
+ai:
+  service-url: ${AI_SERVICE_URL:http://localhost:8000}
+  timeout-seconds: 120
+  max-retries: 2
+
+rate-limit:
+  chat-per-minute: 20
+  login-per-minute: 5
+  upload-per-hour: 5
+
+secure:
+  ignored:
+    urls:
+      - /api/v1/auth/register
+      - /api/v1/auth/login
