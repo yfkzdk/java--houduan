@@ -1,5 +1,6 @@
 package com.yfkzdk.chatbot.config;
 
+import com.yfkzdk.chatbot.modules.user.service.UserService;
 import com.yfkzdk.chatbot.security.component.JwtAuthenticationTokenFilter;
 import com.yfkzdk.chatbot.security.util.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
@@ -7,28 +8,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
- * 桥接配置 — 将 JWT Filter 注入 UserDetailsService 依赖
- * <p>
- * 等 auth 模块写好 UserService 后，改这里的 userDetailsService() 返回值即可。
- * 目前返回一个临时空实现，让项目能启动。
+ * 桥接配置 — 将 JWT Filter 注入真实的 UserService（UserDetailsService）
  */
 @Configuration
 public class SecurityBridgeConfig {
 
     private final JwtAuthenticationTokenFilter jwtFilter;
     private final JwtTokenUtil jwtTokenUtil;
+    private final UserService userService;
 
-    public SecurityBridgeConfig(JwtAuthenticationTokenFilter jwtFilter, JwtTokenUtil jwtTokenUtil) {
+    public SecurityBridgeConfig(JwtAuthenticationTokenFilter jwtFilter,
+                                 JwtTokenUtil jwtTokenUtil,
+                                 UserService userService) {
         this.jwtFilter = jwtFilter;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.userService = userService;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // TODO: Phase 2 — 换成真正的 UserService
-        return username -> {
-            throw new RuntimeException("User service not yet implemented — coming in Phase 2");
-        };
+        return username -> userService.loadUserByUsername(username);
     }
 
     /**

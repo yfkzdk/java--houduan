@@ -30,7 +30,15 @@ public class JwtTokenUtil {
     private Long expiration;
 
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        // Ensure key is at least 256 bits for HS256 (jjwt 0.12)
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 32) {
+            // Pad short keys to 32 bytes
+            byte[] padded = new byte[32];
+            System.arraycopy(keyBytes, 0, padded, 0, Math.min(keyBytes.length, 32));
+            return Keys.hmacShaKeyFor(padded);
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     /**
@@ -39,7 +47,7 @@ public class JwtTokenUtil {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_USERNAME, userDetails.getUsername());
-        claims.put(CLAIM_CREATED, new Date());
+        claims.put(CLAIM_CREATED, System.currentTimeMillis());  // Long, not Date — jjwt 0.12 parser returns Long
         return Jwts.builder()
                 .claims(claims)
                 .expiration(new Date(System.currentTimeMillis() + expiration * 1000))

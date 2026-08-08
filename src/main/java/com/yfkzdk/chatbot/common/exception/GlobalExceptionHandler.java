@@ -36,6 +36,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public CommonResult<?> handleAll(Exception e) {
         log.error("Unhandled exception", e);
-        return CommonResult.failed("服务器内部错误");
+        return CommonResult.failed("服务器内部错误: " + e.getMessage());
     }
 }
