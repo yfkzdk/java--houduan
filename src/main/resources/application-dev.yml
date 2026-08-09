@@ -64,11 +64,12 @@ knife4j:
 secure:
   ignored:
     urls:
-      - /api/v1/auth/register
-      - /api/v1/auth/login
       - /swagger-ui/**
       - /v3/api-docs/**
       - /doc.html
+      - /webjars/**
       - /actuator/**
       - /h2-console/**
       - /favicon.ico
+      - /api/v1/auth/register
+      - /api/v1/auth/login
